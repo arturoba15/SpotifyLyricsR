@@ -9,7 +9,7 @@ const Home = () => {
     <div>
       <h1>Spotify Lyrics</h1>
       
-      <button onClick={() => logIn()}>Log In</button>
+      <a href='/api/login'>Log In</a>
     </div>
   );
 };
