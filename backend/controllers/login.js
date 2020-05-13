@@ -52,9 +52,10 @@ loginRouter.get('/response', async (req, res, next) => {
     try {
       let response = await axios.post('https://accounts.spotify.com/api/token', data, config);
       if (response.status === 200) {
-        //console.log(response.data.access_token);
-        //console.log(response.data.refresh_token);
         // Store tokens
+        res.cookie('at', response.data.access_token, { httpOnly: true });
+        res.cookie('rt', response.data.refresh_token, { httpOnly: true });
+        res.redirect('/');
       }
     } catch (error) {
       return next(error);
@@ -62,4 +63,27 @@ loginRouter.get('/response', async (req, res, next) => {
   }
 });
 
+// Get a new access token from the refresh token
+loginRouter.get('/refresh', async (req, res, next) => {
+  let encodedClient = Buffer.from(`${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`);
+  let data = queryString.stringify({
+    grant_type: 'refresh_token',
+    refresh_token: req.cookies['rt']
+  });
+  let config = {
+    headers: {
+      'Authorization': `Basic ${encodedClient.toString('base64')}`
+    },
+    responseType: 'json'
+  };
+  try {
+    let response = await axios.post('https://accounts.spotify.com/api/token', data, config);
+    if (response === 200) {
+      res.clearCookie('at');
+      res.cookie('at', response.data.access_token, { httpOnly: true });
+    }
+  } catch (error) {
+    return next(error);
+  }
+});
 module.exports = loginRouter;
