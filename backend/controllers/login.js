@@ -1,16 +1,19 @@
 const queryString = require('querystring');
 const loginRouter = require('express').Router();
 const axios = require('axios');
-const utils = require('../utils');
+const csurf = require('csurf');
 
+const csrfMiddleware = csurf({ cookie: true });
 const redirect_uri = process.env.URI || 'http://localhost:5000/api/login/response';
 const stateKey = 'spotify_auth_state';
 
 // Request authorization
-loginRouter.get('/', (req, res) => {
+loginRouter.get('/', csrfMiddleware, (req, res) => {
   let scope = 'user-read-currently-playing';
-  let state = utils.generateRandomString(16);
-  res.cookie(stateKey, state);
+
+  // Use the csrfToken() as a state for the spotify auth
+  let csrfToken = req.csrfToken();
+  res.cookie(stateKey, csrfToken, { httpOnly: true });
 
   res.redirect('https://accounts.spotify.com/authorize/?' + 
     queryString.stringify({
@@ -18,7 +21,7 @@ loginRouter.get('/', (req, res) => {
       response_type: 'code',
       redirect_uri: redirect_uri,
       scope: scope,
-      state: state
+      state: csrfToken
     }))
 });
 
@@ -49,15 +52,13 @@ loginRouter.get('/response', async (req, res, next) => {
     try {
       let response = await axios.post('https://accounts.spotify.com/api/token', data, config);
       if (response.status === 200) {
-        console.log(response.data.access_token);
-        console.log(response.data.refresh_token);
+        //console.log(response.data.access_token);
+        //console.log(response.data.refresh_token);
         // Store tokens
       }
     } catch (error) {
       return next(error);
     }
-  } else {
-
   }
 });
 
