@@ -7,8 +7,12 @@ const csrfMiddleware = csurf({ cookie: true });
 const redirect_uri = process.env.URI || 'http://localhost:5000/api/login/response';
 const stateKey = 'spotify_auth_state';
 
+const enterIfNotLoggedIn = (req, res, next) => {
+  (req.cookies['rt']) ? res.redirect('/') : next()
+};
+
 // Request authorization
-loginRouter.get('/', csrfMiddleware, (req, res) => {
+loginRouter.get('/', enterIfNotLoggedIn, csrfMiddleware, (req, res) => {
   let scope = 'user-read-currently-playing';
 
   // Use the csrfToken() as a state for the spotify auth
@@ -26,15 +30,14 @@ loginRouter.get('/', csrfMiddleware, (req, res) => {
 });
 
 // Try to get an access token
-loginRouter.get('/response', async (req, res, next) => {
+loginRouter.get('/response', enterIfNotLoggedIn , async (req, res, next) => {
   let code = req.query.code || null;
   let state = req.query.state || null;
-  let storedState = req.cookies ? req.cookies[stateKey] : null;
-
+  let storedState = req.cookies[stateKey] ? req.cookies[stateKey] : null;
+  
   // Check if the cookie comes from the same browser
   if (state !== null && state === storedState) {
     res.clearCookie(stateKey);
-
     // Exchange the code for an access token
     let encodedClient = Buffer.from(`${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`);
     let data = queryString.stringify({
@@ -53,13 +56,15 @@ loginRouter.get('/response', async (req, res, next) => {
       let response = await axios.post('https://accounts.spotify.com/api/token', data, config);
       if (response.status === 200) {
         // Store tokens
-        res.cookie('at', response.data.access_token, { httpOnly: true });
-        res.cookie('rt', response.data.refresh_token, { httpOnly: true });
+        res.cookie('at', response.data.access_token, { httpOnly: true, overwrite: true });
+        res.cookie('rt', response.data.refresh_token, { httpOnly: true, overwrite: true });
         res.redirect('/');
       }
     } catch (error) {
       return next(error);
     }
+  } else {
+    return next();
   }
 });
 
@@ -79,11 +84,11 @@ loginRouter.get('/refresh', async (req, res, next) => {
   try {
     let response = await axios.post('https://accounts.spotify.com/api/token', data, config);
     if (response === 200) {
-      res.clearCookie('at');
-      res.cookie('at', response.data.access_token, { httpOnly: true });
+      res.cookie('at', response.data.access_token, { httpOnly: true, overwrite: true });
     }
   } catch (error) {
     return next(error);
   }
 });
+
 module.exports = loginRouter;
