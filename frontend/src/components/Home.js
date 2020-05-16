@@ -9,7 +9,7 @@ const Home = () => {
     <div>
       <h1>Spotify Lyrics</h1>
       
-      <a href='/api/login'>Log In</a>
+      <a href='/login'>Log In</a>
     </div>
   );
 };
