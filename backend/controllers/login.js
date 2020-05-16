@@ -1,5 +1,6 @@
+const { addAsync } = require('@awaitjs/express');
 const queryString = require('querystring');
-const loginRouter = require('express').Router();
+const loginRouter = addAsync(require('express').Router());
 const axios = require('axios');
 const csurf = require('csurf');
 
@@ -30,7 +31,7 @@ loginRouter.get('/', enterIfNotLoggedIn, csrfMiddleware, (req, res) => {
 });
 
 // Try to get an access token
-loginRouter.get('/response', enterIfNotLoggedIn , async (req, res, next) => {
+loginRouter.getAsync('/response', enterIfNotLoggedIn , async (req, res, next) => {
   let code = req.query.code || null;
   let state = req.query.state || null;
   let storedState = req.cookies[stateKey] ? req.cookies[stateKey] : null;
@@ -40,6 +41,7 @@ loginRouter.get('/response', enterIfNotLoggedIn , async (req, res, next) => {
     res.clearCookie(stateKey);
     // Exchange the code for an access token
     let encodedClient = Buffer.from(`${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`);
+    // Data must be encoded in application/x-www-form-urlencoded
     let data = queryString.stringify({
       grant_type: 'authorization_code',
       redirect_uri: redirect_uri,
@@ -52,19 +54,15 @@ loginRouter.get('/response', enterIfNotLoggedIn , async (req, res, next) => {
       responseType: 'json'
     };
 
-    try {
-      let response = await axios.post('https://accounts.spotify.com/api/token', data, config);
-      if (response.status === 200) {
-        // Store tokens
-        res.cookie('at', response.data.access_token, { httpOnly: true, overwrite: true });
-        res.cookie('rt', response.data.refresh_token, { httpOnly: true, overwrite: true });
-        res.redirect('/');
-      }
-    } catch (error) {
-      return next(error);
-    }
+    let response = await axios.post('https://accounts.spotify.com/api/token', data, config)
+      .catch(e => {throw new Error(e)});
+
+      // Store tokens
+      res.cookie('at', response.data.access_token, { httpOnly: true, overwrite: true });
+      res.cookie('rt', response.data.refresh_token, { httpOnly: true, overwrite: true });
+      res.redirect('/');
   } else {
-    return next();
+    throw new Error('Bad state');
   }
 });
 

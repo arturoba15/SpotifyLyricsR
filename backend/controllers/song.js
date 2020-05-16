@@ -1,29 +1,39 @@
-const songRouter = require('express').Router();
+const { addAsync } = require('@awaitjs/express');
+const songRouter = addAsync(require('express').Router());
 const axios = require('axios');
 const queryString = require('querystring');
 
 // Try to get the currently played song
-songRouter.get('/', async (req, res, next) => {
+songRouter.getAsync('/', async (req, res, next) => {
   let config = {
     headers : {
     'Authorization': `Bearer ${req.cookies['at']}`
     }
   };
 
-  try {
     const url = 'https://api.spotify.com/v1/me/player/currently-playing';
-    const response = await axios.get(url, config);
-    if (response.data == '')
-      res.send("No song is playing");
-    res.json(response.data);
-  } catch (error) {
-    if (error.response.status == 401) {
-      if (req.cookies['rt']) { // Refresh the token
-         getNewAccessToken(req.cookies['rt'], res).then(e => {if (e) res.redirect('/song')});
-      }
-      // ELSE Not authenticated
+    const response = await axios.get(url, config)
+      .catch(e => {
+        if (req.cookies['rt']) { // Refresh the token
+          return getNewAccessToken(req.cookies['rt'], res)
+            .then(gotNewToken => {
+              if (gotNewToken)
+                res.redirect('/song');
+              throw new Error('User needs to log-in');
+            });
+        } else {
+          throw new Error('User needs to log-in');
+        }
+      });
+
+    if (response.status === 200) {
+      if (response.data === '')
+        res.send('No song is playing');
+      else
+        res.json(response.data);
+    } else {
+      res.send('No song is playing');
     }
-  }
 });
 
 // Returns true if it gets a new access token
