@@ -6,6 +6,7 @@ const app = express();
 
 const loginRouter = require('./controllers/login');
 const songRouter = require('./controllers/song');
+const lyricsRouter = require('./controllers/lyrics');
 
 require('dotenv').config();
 
@@ -15,19 +16,8 @@ app.use(express.static(path.join(__dirname, '../frontend/dist')));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-// app.use((req, res, next) => {
-//   if (req.cookies['rt']) {
-//     if (req.cookies['at']) {
-//     // Try to get currently played song 
-//       res.redirect('/song');
-//     }
-//   } else {
-//     // Show '/'
-//   }
-//   next();
-// });
-
 app.use('/login', loginRouter);
 app.use('/song', songRouter);
+app.use('/lyrics', lyricsRouter);
 
 module.exports = app;
