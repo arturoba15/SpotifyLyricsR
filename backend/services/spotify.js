@@ -1,7 +1,7 @@
 const axios = require('axios');
 const queryString = require('querystring');
 
-const getNewAccessToken = (refreshToken) => {
+const getNewAccessToken = refreshToken => {
   let encodedClient = Buffer.from(`${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`);
   let data = queryString.stringify({
     grant_type: 'refresh_token',
@@ -20,7 +20,7 @@ const getNewAccessToken = (refreshToken) => {
 };
 
 // Gets the current song played by the user
-const currentSong =(accessToken) => {
+const currentSong = accessToken => {
   let config = {
     headers : {
       'Authorization': `Bearer ${accessToken}`

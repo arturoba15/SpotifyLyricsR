@@ -19,9 +19,10 @@ const controllerHandler = (promise, params) => async (req, res, next) => {
   try {
     const result = await promise(...boundParams);
     if (result.at) {
+      res.cookie('loggedIn', true, { overwrite: true });
       res.cookie('at', result.at, { httpOnly: true, overwrite: true });
+      delete result.at;
     }
-    delete result.at;
     return res.json(result || { message: 'OK' });
   } catch (error) {
     return res.send(error);
