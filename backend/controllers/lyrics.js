@@ -1,21 +1,26 @@
-const { addAsync } = require('@awaitjs/express');
-const lyricsRouter = addAsync(require('express').Router());
-const axios = require('axios');
+const { getBestHit, getLyrics } = require('../services/lyrics');
+const { getNewAccessToken, currentSong } = require('../services/spotify');
+const retryOnce = require('../util/retry');
 
-lyricsRouter.getAsync('/', async (req, res) => {
-  console.log('cool');
-  const song = await axios.get('/song');
-  const config = {
-    headers: {
-      'Authorization': `Bearer ${process.env.GENIUS_AT}`
-    }
-  };
-  const url = "https://api.genius.com/search?q=" + song.artist + ' ' + song.name;
+const retrieveLyrics = async (accessToken, refreshToken) =>
+  (async () => await retryOnce(
+    async (newAt) => {
+      const song = await currentSong(newAt || accessToken);
+      const hit = await getBestHit(song.title, song.artist);
+      return {
+        ...hit,
+        at: newAt
+      };
+    },
+    refresh,
+    refreshToken
+  ))()
 
-  const response = await axios.get(url, config);
+function refresh(err, refreshToken) {
+  if (err.response)
+    if (err.response.status === 401)
+      return getNewAccessToken(refreshToken);
+  return Promise.reject(err);
+}
 
-  res.json(response);
-
-});
-
-module.exports = lyricsRouter;
+exports.retrieveLyrics = retrieveLyrics;

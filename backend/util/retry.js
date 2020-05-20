@@ -1,4 +1,4 @@
-module.exports = function retryOnce(func, recoverFunc, at, rt) {
-  return func(at)
+module.exports = function retryOnce(func, recoverFunc, rt) {
+  return func()
     .catch(err => recoverFunc(err, rt).then(at => func(at)));
 };
