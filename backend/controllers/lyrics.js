@@ -7,8 +7,10 @@ const retrieveLyrics = async (accessToken, refreshToken) =>
     async (newAt) => {
       const song = await currentSong(newAt || accessToken);
       const hit = await getBestHit(song.title, song.artist);
+      const lyrics = await getLyrics(hit.url);
       return {
         ...hit,
+        lyrics: lyrics,
         at: newAt
       };
     },

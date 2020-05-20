@@ -1,6 +1,7 @@
 const axios = require('axios');
-const htmlParser2 = require('htmlparser2');
+const cheerio = require('cheerio');
 
+// Gets the best hit on a lyric search on Genius
 const getBestHit = async (title, artist) => {
   const config = {
     headers: {
@@ -19,22 +20,22 @@ const getBestHit = async (title, artist) => {
             artist: bestHit['primary_artist']['name']
         }
       } else {
-        return { error: 'No lyrics available'}
+        throw new Error('No lyrics available');
       }
     }
     );
 };
 
-const getLyrics = async url => {
-  const config = {
-    headers: {
-      'Authorization': 'Bearer ' + process.env.GENIUS_AT
-    }
-  };
-  const lyricsUrl = `https://api.genius.com/search?q=${encodeURIComponent(name + ' ' + artist)}`;
-  return axios.get(url, config)
-
-};
+// Parse the HTML response by Genius
+const getLyrics = async url =>
+  axios.get(url)
+    .then(res => {
+      const $ = cheerio.load(res.data);
+      const lyrics = $('.lyrics p').text(); 
+      // Sometimes the lyrics are inside <meta> tags for some reason
+      if (lyrics === '') throw new Error('Couldn\'nt find lyrics in HTML');
+      return lyrics;
+    });
 
 exports.getBestHit = getBestHit;
 exports.getLyrics = getLyrics;
