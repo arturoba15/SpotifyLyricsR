@@ -24,8 +24,7 @@ const controllerHandler = (promise, params) => async (req, res, next) => {
     }
     return res.json(result || { message: 'OK' });
   } catch (error) {
-    console.log(error);
-    return res.send(error);
+    throw error;
   }
 };
 const ch = controllerHandler;
@@ -38,8 +37,24 @@ app.use('/', express.static(path.join(__dirname, '../frontend/dist')));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
+app.use((req, res, next) => {
+  (req.cookies['rt']) ? 
+      res.cookie('loggedIn', true, { overwrite: true }) :
+      res.cookie('loggedIn', false, { overwrite: true });
+  next();
+});
+
 app.use('/login', loginRouter);
 app.getAsync('/lyrics', ch(retrieveLyrics, (req) => [req.cookies['at'], req.cookies['rt']]))
 
+app.use((error, req, res, next) => {
+  if (error.status === 401)
+    res.cookie('loggedIn', false, { overwrite: true });
+  res.status(error.status);
+  res.json({ 
+    message: error.message,
+    status: error.status
+  });
+});
 
 module.exports = app;

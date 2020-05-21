@@ -3,6 +3,7 @@ const queryString = require('querystring');
 const loginRouter = addAsync(require('express').Router());
 const axios = require('axios');
 const csurf = require('csurf');
+const createError = require('http-errors');
 
 const csrfMiddleware = csurf({ cookie: true });
 const redirect_uri = process.env.URI || 'http://localhost:5000/login/response';
@@ -55,14 +56,18 @@ loginRouter.getAsync('/response', enterIfNotLoggedIn , async (req, res, next) =>
     };
 
     let response = await axios.post('https://accounts.spotify.com/api/token', data, config)
-      .catch(e => {throw new Error(e)});
 
+    if (response.data.refresh_token) {
       // Store tokens
+      res.cookie('loggedIn', true, { overwrite: true });
       res.cookie('at', response.data.access_token, { httpOnly: true, overwrite: true });
       res.cookie('rt', response.data.refresh_token, { httpOnly: true, overwrite: true });
       res.redirect('/');
+    } else {
+      throw createError(503, 'Spotify request unavailable');
+    }
   } else {
-    throw new Error('Bad state');
+    throw createError(401, 'Bad state');
   }
 });
 

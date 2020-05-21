@@ -1,5 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const createError = require('http-errors');
 
 // Gets the best hit on a lyric search on Genius
 const getBestHit = async (title, artist) => {
@@ -20,7 +21,7 @@ const getBestHit = async (title, artist) => {
             artist: bestHit['primary_artist']['name']
         }
       } else {
-        throw new Error('No lyrics available');
+        throw createError(404, `No lyrics found for ${title}`);
       }
     }
     );
@@ -33,7 +34,7 @@ const getLyrics = async url =>
       const $ = cheerio.load(res.data);
       const lyrics = $('.lyrics p').text(); 
       // Sometimes the lyrics are inside <meta> tags for some reason
-      if (lyrics === '') throw new Error('Couldn\'nt find lyrics in HTML');
+      if (lyrics === '') throw createError(422, 'Couldn\'nt find lyrics in HTML');
       return lyrics;
     });
 

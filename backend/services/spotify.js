@@ -1,5 +1,6 @@
 const axios = require('axios');
 const queryString = require('querystring');
+const createError = require('http-errors');
 
 const getNewAccessToken = async refreshToken => {
   let encodedClient = Buffer.from(`${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`);
@@ -30,14 +31,14 @@ const currentSong = async accessToken => {
   .then(res => {
   if (res.status === 200) {
     if (res.data === '')
-      throw new Error('No song is playing');
+      throw createError(400, 'No song is playing');
     else
       return {
         title: res.data.item.name,
         artist: res.data.item.artists[0].name
       };
   } else {
-    throw new Error('No song is playing');
+    throw createError(400, 'No song is playing');
   }
   });
   
