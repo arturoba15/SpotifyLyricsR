@@ -9,6 +9,7 @@ const getBestHit = async (title, artist) => {
       'Authorization': 'Bearer ' + process.env.GENIUS_AT
     }
   };
+  title = sanitize(title);
   const url = `https://api.genius.com/search?q=${encodeURIComponent(title + ' ' + artist)}`;
   return axios.get(url, config)
     .then(res =>  {
@@ -38,11 +39,23 @@ const getLyrics = async url =>
         const scriptTag = $('body > script:not([src])').html();
         const parsedJson = eval(scriptTag.substring(36, scriptTag.indexOf('window.__APP')));
         const lyricsObj = parsedJson.songPage.lyricsData.body;
-        lyrics = lyricsObj.children[0].children.filter(e => typeof e === 'string').join('\n');
+        lyrics = lyricsObj.children[0].children.reduce((acc, curr) => {
+          if (typeof curr !== 'string') {
+            if (curr.hasOwnProperty('children'))
+              return acc.concat(curr.children.filter(e => typeof e === 'string' && e !== ''));
+          } else {
+            acc.push(curr);
+          }
+          return acc;
+        }, []).join('\n');
       }
       return lyrics;
     })
-    .catch(res => {throw createError(422, 'Couldn\'nt find lyrics in HTML')});
+    .catch(err => {throw createError(422, `${err.message} - Failed getting lyrics from: ${url}`)});
+
+function sanitize(title) {
+  return title.replace(/ *\([^)]*\) */g, '');
+}
 
 exports.getBestHit = getBestHit;
 exports.getLyrics = getLyrics;
