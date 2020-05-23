@@ -14,6 +14,13 @@ module.exports = {
         ]
     },
     mode:'development',
+    devServer: {
+      index: '',
+      proxy: {
+          context: () => true,
+          target: "http://localhost:5000"
+      }
+    },
     plugins: [
       new HtmlWebpackPlugin({
         hash: true,

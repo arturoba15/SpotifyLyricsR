@@ -1,10 +1,11 @@
 import React from 'react';
-import Home from './components/Home';
+import LyricsApp from './components/LyricsApp';
+import './style.css';
 
 const App = (props) => {
   return (
     <div className="App">
-      <Home />
+      <LyricsApp />
     </div>
   );
 };
