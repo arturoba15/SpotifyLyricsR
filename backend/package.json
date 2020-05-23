@@ -20,7 +20,9 @@
     "csurf": "^1.11.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "http-errors": "^1.7.3"
+    "http-errors": "^1.7.3",
+    "request-promise": "^4.2.5",
+    "shift-ast": "^6.1.0"
   },
   "devDependencies": {
     "jest": "^26.0.1",
