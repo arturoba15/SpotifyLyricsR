@@ -14,7 +14,8 @@ const getBestHit = async (title, artist) => {
   return axios.get(url, config)
     .then(res =>  {
       const bestHit = res.data.response.hits[0].result;
-      if (bestHit.title.toUpperCase() === title.toUpperCase()) {
+      const hitTitle = sanitize(bestHit.title);
+      if (hitTitle.toUpperCase() === title.toUpperCase()) {
         return {
             url: bestHit['url'],
             img: bestHit['song_art_image_thumbnail_url'],
@@ -54,7 +55,9 @@ const getLyrics = async url =>
     .catch(err => {throw createError(422, `${err.message} - Failed getting lyrics from: ${url}`)});
 
 function sanitize(title) {
-  return title.replace(/ *\([^)]*\) */g, '');
+  title = title.replace(/ *\([^)]*\) */g, '');
+  title = title.replace(/[^a-zA-Z ]/g, '');
+  return title;
 }
 
 exports.getBestHit = getBestHit;
