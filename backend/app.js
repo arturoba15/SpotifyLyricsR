@@ -30,7 +30,7 @@ const controllerHandler = (promise, params) => async (req, res, next) => {
 const ch = controllerHandler;
 
 const loggedIn = (req, res, next) => {
-  if (res.cookie['rt']) return next();
+  if (req.cookies['rt']) return next();
   res.end();
 };
 
