@@ -25,17 +25,17 @@ class LyricsApp extends React.Component {
     if (this.state.song.title) {
       const song = this.state.song;
       return (
-        <>
+        <div className="LyricsApp">
           <SongPanel song={song}/>
           <LyricsPanel lyrics={song.lyrics}/>
-        </>
+        </div>
       );
     } else {
       return (
-        <>
+        <div>
           <LoginPanel />
           <LyricsPanel />
-        </>
+        </div>
       );
     }
   }
