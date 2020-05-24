@@ -47,10 +47,9 @@ app.getAsync('/lyrics', loggedIn, ch(retrieveLyrics, (req) => [req.cookies['at']
 
 app.use((error, req, res, next) => {
   res.status(error.status || 500);
-  res.json({ error: {
+  res.json({ 
     message: error.message,
     status: error.status
-  } 
   });
 });
 

@@ -3,7 +3,7 @@ import React from 'react';
 class LyricsPanel extends React.Component {
   render() {
     return (
-     <div className="lyrics panel">
+     <div className="lyrics">
        {this.props.lyrics}
      </div> 
     );

@@ -2,7 +2,8 @@ import React from 'react';
 import axios from 'axios';
 import SongPanel from './SongPanel';
 import LyricsPanel from './LyricsPanel';
-import LoginPanel from './LoginPanel';
+import SongPlaceholder from './SongPlaceholder';
+import LyricsPlaceholder from './LyricsPlaceholder';
 
 class LyricsApp extends React.Component {
   constructor(props) {
@@ -17,32 +18,39 @@ class LyricsApp extends React.Component {
       .then(res => {
         const song = res.data;
         this.setState({ song });
+      })
+      .catch(err => {
+        const errorMsg = err.response.data.message;
+        this.setState(prev => ({
+          song: {
+          ...prev.song,
+          error: errorMsg
+          }
+        }));
       });
   }
 
   render() {
-    // If we get a song as response, we are logged in
-    if (this.state.song.title) {
-      const song = this.state.song;
+    const song = this.state.song;
+    if (song.title) {
       return (
         <div className="LyricsApp">
           <SongPanel song={song}/>
           <LyricsPanel lyrics={song.lyrics}/>
         </div>
       );
-    } else if (this.state.error) {
-      const error = this.state.error;
+    } else if (song.error) {
       return (
         <div className="LyricsApp">
-          <SongPanel error={error}/>
-          <LyricsPanel lyrics={song.lyrics}/>
+          <SongPanel />
+          <LyricsPanel />
         </div>
       );
     } else {
       return (
         <div>
-          <LoginPanel />
-          <LyricsPanel />
+          <SongPlaceholder />
+          <LyricsPlaceholder />
         </div>
       );
     }
