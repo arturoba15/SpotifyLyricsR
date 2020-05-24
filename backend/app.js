@@ -30,8 +30,8 @@ const controllerHandler = (promise, params) => async (req, res, next) => {
 const ch = controllerHandler;
 
 const loggedIn = (req, res, next) => {
-  if (req.cookies['rt']) return next();
-  throw createError(401, 'Log in to continue');
+  if (res.cookie['rt']) return next();
+  res.end();
 };
 
 require('dotenv').config();
