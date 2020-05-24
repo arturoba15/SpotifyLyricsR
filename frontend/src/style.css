@@ -21,10 +21,12 @@ body {
 }
 
 .lyrics {
-  padding-top: 5%;
-  padding-bottom: 5%;
+  /* padding-top: 5%;
+  padding-bottom: 5%; */
+  padding: 5% 20% 5% 20%;
   font-family: 'Montserrat-Regular';
   margin-left: 30%;
+  height: 100vh;
   overflow: auto;
   text-align: center;
   white-space: pre-wrap; 
