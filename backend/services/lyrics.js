@@ -15,9 +15,7 @@ const getBestHit = async (title, artist) => {
     .then(res =>  {
       const bestHit = res.data.response.hits[0].result;
       return {
-          url: bestHit['url'],
-          title: bestHit['title'],
-          artist: bestHit['primary_artist']['name']
+          url: bestHit['url']
       }
     })
     .catch(e => {throw createError(404, `No lyrics found for "${title}"`)});
