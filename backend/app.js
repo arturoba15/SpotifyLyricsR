@@ -50,7 +50,7 @@ app.getAsync('/lyrics', ch(retrieveLyrics, (req) => [req.cookies['at'], req.cook
 app.use((error, req, res, next) => {
   if (error.status === 401)
     res.cookie('loggedIn', false, { overwrite: true });
-  res.status(error.status);
+  res.status(error.status || 500);
   res.json({ 
     message: error.message,
     status: error.status

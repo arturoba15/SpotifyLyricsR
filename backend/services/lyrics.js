@@ -14,19 +14,13 @@ const getBestHit = async (title, artist) => {
   return axios.get(url, config)
     .then(res =>  {
       const bestHit = res.data.response.hits[0].result;
-      const hitTitle = sanitize(bestHit.title);
-      if (hitTitle.toUpperCase() === title.toUpperCase()) {
-        return {
-            url: bestHit['url'],
-            img: bestHit['song_art_image_thumbnail_url'],
-            title: bestHit['title'],
-            artist: bestHit['primary_artist']['name']
-        }
-      } else {
-        throw createError(404, `No lyrics found for ${title}`);
+      return {
+          url: bestHit['url'],
+          title: bestHit['title'],
+          artist: bestHit['primary_artist']['name']
       }
-    }
-    );
+    })
+    .catch(e => {throw createError(404, `No lyrics found for "${title}"`)});
 };
 
 // Parse the HTML response by Genius
@@ -55,8 +49,9 @@ const getLyrics = async url =>
     .catch(err => {throw createError(422, `${err.message} - Failed getting lyrics from: ${url}`)});
 
 function sanitize(title) {
-  title = title.replace(/ *\([^)]*\) */g, '');
-  title = title.replace(/[^a-zA-Z ]/g, '');
+  title = title.replace(/ *\([^)]*\) */g, ''); // Delete parentheses and its contents
+  // title = title.replace(/[^a-zA-Z ]/g, '');
+  title = title.replace(/\-(.*)/g, '');
   return title;
 }
 

@@ -10,6 +10,7 @@ const retrieveLyrics = async (accessToken, refreshToken) =>
       const lyrics = await getLyrics(hit.url);
       return {
         ...hit,
+        img: song.img,
         lyrics: lyrics,
         at: newAt
       };

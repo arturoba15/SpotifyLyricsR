@@ -35,7 +35,8 @@ const currentSong = async accessToken => {
     else
       return {
         title: res.data.item.name,
-        artist: res.data.item.artists[0].name
+        artist: res.data.item.artists[0].name,
+        img: res.data.item.album.images[1].url
       };
   } else {
     throw createError(400, 'No song is playing');
