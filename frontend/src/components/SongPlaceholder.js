@@ -13,9 +13,9 @@ class LoginPanel extends React.Component {
         backgroundColor="#434e4f"
         foregroundColor="#293132"
       >
-        <rect x="52" y="50" rx="10" ry="0" width="300" height="300" /> 
-        <rect x="52" y="400" rx="10" ry="0" width="300" height="30" /> 
-        <rect x="102" y="450" rx="10" ry="0" width="200" height="30" />
+        <rect x="52" y="50" rx="10" ry="10" width="300" height="300" /> 
+        <rect x="52" y="400" rx="10" ry="10" width="300" height="30" /> 
+        <rect x="102" y="450" rx="10" ry="10" width="200" height="30" />
       </ContentLoader> 
     </div>
     );
