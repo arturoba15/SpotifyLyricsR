@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const createError = require('http-errors');
 const { addAsync } = require('@awaitjs/express');
 const app = addAsync(express());
 
@@ -18,7 +19,6 @@ const controllerHandler = (promise, params) => async (req, res, next) => {
   try {
     const result = await promise(...boundParams);
     if (result.at) {
-      res.cookie('loggedIn', true, { overwrite: true });
       res.cookie('at', result.at, { httpOnly: true, overwrite: true });
       delete result.at;
     }
@@ -29,6 +29,11 @@ const controllerHandler = (promise, params) => async (req, res, next) => {
 };
 const ch = controllerHandler;
 
+const loggedIn = (req, res, next) => {
+  if (req.cookies['rt']) return next();
+  throw createError(401, 'Log in to continue');
+};
+
 require('dotenv').config();
 
 // Serve static files from the React app
@@ -37,19 +42,10 @@ app.use('/', express.static(path.join(__dirname, '../frontend/dist')));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-app.use((req, res, next) => {
-  (req.cookies['rt']) ? 
-      res.cookie('loggedIn', true, { overwrite: true }) :
-      res.cookie('loggedIn', false, { overwrite: true });
-  next();
-});
-
 app.use('/login', loginRouter);
-app.getAsync('/lyrics', ch(retrieveLyrics, (req) => [req.cookies['at'], req.cookies['rt']]))
+app.getAsync('/lyrics', loggedIn, ch(retrieveLyrics, (req) => [req.cookies['at'], req.cookies['rt']]));
 
 app.use((error, req, res, next) => {
-  if (error.status === 401)
-    res.cookie('loggedIn', false, { overwrite: true });
   res.status(error.status || 500);
   res.json({ 
     message: error.message,

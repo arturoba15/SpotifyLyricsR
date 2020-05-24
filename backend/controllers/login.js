@@ -59,7 +59,6 @@ loginRouter.getAsync('/response', enterIfNotLoggedIn , async (req, res, next) =>
 
     if (response.data.refresh_token) {
       // Store tokens
-      res.cookie('loggedIn', true, { overwrite: true });
       res.cookie('at', response.data.access_token, { httpOnly: true, overwrite: true });
       res.cookie('rt', response.data.refresh_token, { httpOnly: true, overwrite: true });
       res.redirect('/');
