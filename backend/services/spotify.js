@@ -30,19 +30,22 @@ const currentSong = async accessToken => {
   return axios.get(url, config)
   .then(res => {
   if (res.status === 200) {
-    if (res.data === '')
+    if (res.data === '') {
       throw createError(400, 'No song is playing');
-    else
-      return {
-        title: res.data.item.name,
-        artist: res.data.item.artists[0].name,
-        img: res.data.item.album.images[1].url
-      };
+    } else {
+      if (res.data.item)
+        return {
+          title: res.data.item.name,
+          artist: res.data.item.artists[0].name,
+          img: res.data.item.album.images[1].url
+        };
+      throw createError(400, 'This is not a valid song');
+    }
   } else {
     throw createError(400, 'No song is playing');
   }
   })
-  .catch(e => {throw createError(401, e)});
+  .catch(e => {throw createError(e.status, e)});
   
 };
 

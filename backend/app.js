@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
 const { addAsync } = require('@awaitjs/express');
 const app = addAsync(express());
 
@@ -35,12 +36,12 @@ const loggedIn = (req, res, next) => {
 
 require('dotenv').config();
 
-// Serve static files from the React app
-app.use('/', express.static(path.join(__dirname, '../frontend/dist')));
-
+app.use(helmet());
 app.use(bodyParser.json());
 app.use(cookieParser());
 
+// Serve static files from the React app
+app.use('/', express.static(path.join(__dirname, '../frontend/dist')));
 app.use('/login', loginRouter);
 app.getAsync('/lyrics', loggedIn, ch(retrieveLyrics, (req) => [req.cookies['at'], req.cookies['rt']]));
 
