@@ -4,6 +4,7 @@ import SongPanel from './SongPanel';
 import LyricsPanel from './LyricsPanel';
 import SongPlaceholder from './SongPlaceholder';
 import LyricsPlaceholder from './LyricsPlaceholder';
+import ErrorPanel from './ErrorPanel';
 
 class LyricsApp extends React.Component {
   constructor(props) {
@@ -42,7 +43,7 @@ class LyricsApp extends React.Component {
     } else if (song.error) {
       return (
         <div className="LyricsApp">
-          <SongPanel />
+          <ErrorPanel error={song.error} />
           <LyricsPanel />
         </div>
       );
