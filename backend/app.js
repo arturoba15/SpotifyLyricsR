@@ -2,7 +2,6 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const createError = require('http-errors');
 const { addAsync } = require('@awaitjs/express');
 const app = addAsync(express());
 

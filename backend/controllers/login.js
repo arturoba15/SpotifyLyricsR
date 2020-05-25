@@ -14,13 +14,12 @@ const enterIfNotLoggedIn = (req, res, next) => {
 };
 
 // Request authorization
-loginRouter.get('/', enterIfNotLoggedIn, csrfMiddleware, (req, res) => {
+loginRouter.get('/', csrfMiddleware, (req, res) => {
   let scope = 'user-read-currently-playing';
 
   // Use the csrfToken() as a state for the spotify auth
   let csrfToken = req.csrfToken();
   res.cookie(stateKey, csrfToken, { httpOnly: true });
-
   res.redirect('https://accounts.spotify.com/authorize/?' + 
     queryString.stringify({
       client_id: process.env.CLIENT_ID,
