@@ -66,6 +66,37 @@ body {
   height: auto;
 }
 
+.loginButton {
+  appearance: none;
+  background-color: transparent;
+  border: 2px solid #1DB954;
+  border-radius: 15px;
+  color: #1DB954;
+  cursor: pointer;
+  align-self: center;
+  font-size: 1rem;
+  line-height: 1;
+  /* padding: 1.2em 2.8em; */
+  padding: 5% 10%;
+  text-decoration: none;
+  text-align: center;
+  text-transform: uppercase;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+}
+
+.loginButton:hover {
+  transition: box-shadow 300ms ease-in-out, color 300ms ease-in-out;
+  color: #fff;
+  outline: 0;
+  box-shadow: 0 0 40px 40px #1DB954 inset;
+}
+
+.loginButton > * {
+  max-width: inherit;
+  height: auto;
+}
+
 img {
   margin-bottom: 5%;
   -webkit-filter: grayscale(0);
