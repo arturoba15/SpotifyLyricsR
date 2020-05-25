@@ -42,7 +42,7 @@ const currentSong = async accessToken => {
     throw createError(400, 'No song is playing');
   }
   })
-  .catch(e => {throw createError(400, 'No song is playing')});
+  .catch(e => {throw createError(401, e)});
   
 };
 
