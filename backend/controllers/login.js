@@ -6,7 +6,7 @@ const csurf = require('csurf');
 const createError = require('http-errors');
 
 const csrfMiddleware = csurf({ cookie: true });
-const redirect_uri = process.env.URI || 'http://localhost:5000/login/response';
+const redirect_uri = process.env.URI || `http://localhost:${process.env.PORT}/login/response`;
 const stateKey = 'spotify_auth_state';
 
 const enterIfNotLoggedIn = (req, res, next) => {
