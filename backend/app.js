@@ -41,7 +41,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 // Serve static files from the React app
-app.use('/', express.static(path.join(__dirname, 'dist')));
+app.use('/', express.static(path.join(__dirname, 'dist/')));
 app.use('/login', loginRouter);
 app.getAsync('/lyrics', loggedIn, ch(retrieveLyrics, (req) => [req.cookies['at'], req.cookies['rt']]));
 
